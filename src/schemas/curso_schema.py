@@ -1,11 +1,13 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
 
 class CursoBase(BaseModel):
-    nombre_curso: str = Field(..., validation_alias="nombreCurso")
-    nombre_docente: str = Field(..., validation_alias="nombreDocente")
+    model_config = {"populate_by_name": True, "extra": "ignore"}
+
+    nombre_curso: str
+    nombre_docente: str
     horario: str
     color: int
     docente_id: str
@@ -16,8 +18,10 @@ class CursoCreate(CursoBase):
 
 
 class CursoUpdate(BaseModel):
-    nombre_curso: Optional[str] = Field(None, validation_alias="nombreCurso")
-    nombre_docente: Optional[str] = Field(None, validation_alias="nombreDocente")
+    model_config = {"populate_by_name": True, "extra": "ignore"}
+
+    nombre_curso: Optional[str] = None
+    nombre_docente: Optional[str] = None
     horario: Optional[str] = None
     color: Optional[int] = None
 
