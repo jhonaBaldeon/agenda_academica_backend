@@ -8,3 +8,5 @@ services:
     envVars:
       - key: GITHUB_TOKEN
         sync: false
+      - key: FIREBASE_CONFIG
+        sync: false

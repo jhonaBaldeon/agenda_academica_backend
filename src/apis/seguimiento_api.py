@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
 from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException
+
 from ..schemas.seguimiento_schema import (
     Seguimiento,
     SeguimientoCreate,
@@ -26,8 +28,8 @@ def create_seguimiento(
 
 @router.get("", response_model=List[Seguimiento])
 def get_seguimientos(
-    alumno_id: str = None,
-    curso_id: str = None,
+    alumno_id: str | None = None,
+    curso_id: str | None = None,
     repo: SeguimientoRepository = Depends(get_seguimiento_repository),
 ):
     if alumno_id and curso_id:
