@@ -45,6 +45,7 @@ def update_curso(
     curso_id: str,
     body: dict = Body(...),
     repo: CursoRepository = Depends(get_curso_repository),
+    seguimiento_repo: SeguimientoRepository = Depends(get_seguimiento_repository),
 ):
     # Convertir camelCase a snake_case
     data = {}
@@ -60,6 +61,18 @@ def update_curso(
     curso = repo.update(curso_id, curso_update)
     if not curso:
         raise HTTPException(status_code=404, detail="Curso no encontrado")
+
+    # Actualizar nombre del curso en seguimientos relacionados
+    if "nombre_curso" in data and data["nombre_curso"]:
+        from ..schemas.seguimiento_schema import SeguimientoUpdate
+
+        seguimientos = seguimiento_repo.get_by_curso(curso_id)
+        for seg in seguimientos:
+            seg_update = SeguimientoUpdate(
+                curso_nombre=data["nombre_curso"],
+            )
+            seguimiento_repo.update(seg.id, seg_update)
+
     return curso
 
 

@@ -41,6 +41,7 @@ class SeguimientoUpdate(BaseModel):
     actividad_descripcion: Optional[str] = None
     actividad_fecha_entrega: Optional[datetime] = None
     actividad_prioridad: Optional[PrioridadActividad] = None
+    curso_nombre: Optional[str] = None
 
 
 class Seguimiento(SeguimientoBase):
