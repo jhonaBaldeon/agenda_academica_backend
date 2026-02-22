@@ -6,6 +6,7 @@ from ..schemas.seguimiento_schema import (
     SeguimientoCreate,
     SeguimientoUpdate,
     EstadoSeguimiento,
+    PrioridadActividad,
 )
 from ..firebase_config import get_db
 
