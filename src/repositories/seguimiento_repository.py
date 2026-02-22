@@ -46,6 +46,20 @@ class SeguimientoRepository:
             return "no_realizado"
         return "incompleto"
 
+    def _prioridad_from_string(self, value: str) -> PrioridadActividad:
+        if value == "alta":
+            return PrioridadActividad.alta
+        elif value == "baja":
+            return PrioridadActividad.baja
+        return PrioridadActividad.media
+
+    def _prioridad_to_string(self, prioridad: PrioridadActividad) -> str:
+        if prioridad == PrioridadActividad.alta:
+            return "alta"
+        elif prioridad == PrioridadActividad.baja:
+            return "baja"
+        return "media"
+
     def _to_seguimiento(self, doc) -> Seguimiento:
         data = doc.to_dict()
         return Seguimiento(
@@ -57,6 +71,9 @@ class SeguimientoRepository:
             actividad_descripcion=data.get("actividad_descripcion", ""),
             actividad_fecha_entrega=self._parse_fecha(
                 data.get("actividad_fecha_entrega")
+            ),
+            actividad_prioridad=self._prioridad_from_string(
+                data.get("actividad_prioridad", "media")
             ),
             curso_id=data.get("curso_id", ""),
             curso_nombre=data.get("curso_nombre", ""),
@@ -79,6 +96,7 @@ class SeguimientoRepository:
             actividad_titulo=seguimiento.actividad_titulo,
             actividad_descripcion=seguimiento.actividad_descripcion,
             actividad_fecha_entrega=seguimiento.actividad_fecha_entrega,
+            actividad_prioridad=seguimiento.actividad_prioridad,
             curso_id=seguimiento.curso_id,
             curso_nombre=seguimiento.curso_nombre,
             estado=seguimiento.estado,
@@ -96,6 +114,9 @@ class SeguimientoRepository:
                 "actividad_titulo": nuevo_seguimiento.actividad_titulo,
                 "actividad_descripcion": nuevo_seguimiento.actividad_descripcion,
                 "actividad_fecha_entrega": firestore.SERVER_TIMESTAMP,
+                "actividad_prioridad": self._prioridad_to_string(
+                    nuevo_seguimiento.actividad_prioridad
+                ),
                 "curso_id": nuevo_seguimiento.curso_id,
                 "curso_nombre": nuevo_seguimiento.curso_nombre,
                 "estado": self._estado_to_string(nuevo_seguimiento.estado),

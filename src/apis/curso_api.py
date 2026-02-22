@@ -188,6 +188,18 @@ def update_actividad(
                 )
                 seguimiento_repo.update(seg.id, seg_update)
 
+        # Actualizar prioridad en seguimientos
+        if "prioridad" in update_data:
+            prioridad = update_data["prioridad"]
+            seguimientos = seguimiento_repo.get_by_actividad(actividad_id)
+            for seg in seguimientos:
+                from ..schemas.seguimiento_schema import SeguimientoUpdate
+
+                seg_update = SeguimientoUpdate(
+                    actividad_prioridad=prioridad,
+                )
+                seguimiento_repo.update(seg.id, seg_update)
+
     except Exception as e:
         print(f"Error updating seguimientos: {e}")
 

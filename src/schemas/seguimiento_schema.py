@@ -10,6 +10,12 @@ class EstadoSeguimiento(str, Enum):
     no_realizado = "noRealizado"
 
 
+class PrioridadActividad(str, Enum):
+    alta = "alta"
+    media = "media"
+    baja = "baja"
+
+
 class SeguimientoBase(BaseModel):
     alumno_id: str
     alumno_nombre: str
@@ -17,6 +23,7 @@ class SeguimientoBase(BaseModel):
     actividad_titulo: str
     actividad_descripcion: str
     actividad_fecha_entrega: datetime
+    actividad_prioridad: PrioridadActividad = PrioridadActividad.media
     curso_id: str
     curso_nombre: str
     estado: EstadoSeguimiento = EstadoSeguimiento.incompleto
@@ -33,6 +40,7 @@ class SeguimientoUpdate(BaseModel):
     actividad_titulo: Optional[str] = None
     actividad_descripcion: Optional[str] = None
     actividad_fecha_entrega: Optional[datetime] = None
+    actividad_prioridad: Optional[PrioridadActividad] = None
 
 
 class Seguimiento(SeguimientoBase):
