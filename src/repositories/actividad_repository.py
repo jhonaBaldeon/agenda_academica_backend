@@ -166,7 +166,7 @@ class ActividadRepository:
         if "estado" in update_data:
             update_data["estado"] = self._estado_to_string(update_data["estado"])
         if "fecha_entrega" in update_data:
-            update_data["fecha_entrega"] = update_data["fecha_entrega"]
+            update_data["fecha_entrega"] = firestore.SERVER_TIMESTAMP
 
         update_data["updated_at"] = firestore.SERVER_TIMESTAMP
         doc_ref.update(update_data)
