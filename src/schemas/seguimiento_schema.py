@@ -30,6 +30,9 @@ class SeguimientoCreate(SeguimientoBase):
 class SeguimientoUpdate(BaseModel):
     estado: Optional[EstadoSeguimiento] = None
     observaciones: Optional[str] = None
+    actividad_titulo: Optional[str] = None
+    actividad_descripcion: Optional[str] = None
+    actividad_fecha_entrega: Optional[datetime] = None
 
 
 class Seguimiento(SeguimientoBase):

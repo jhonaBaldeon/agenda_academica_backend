@@ -126,6 +126,13 @@ class CursoRepository:
             return None
 
         update_data = curso_update.model_dump(exclude_unset=True)
+
+        # Normalizar nombres de campos (Flutter usa camelCase)
+        if "nombreCurso" in update_data:
+            update_data["nombre_curso"] = update_data.pop("nombreCurso")
+        if "nombreDocente" in update_data:
+            update_data["nombre_docente"] = update_data.pop("nombreDocente")
+
         update_data["updated_at"] = firestore.SERVER_TIMESTAMP
         doc_ref.update(update_data)
 

@@ -163,6 +163,14 @@ class SeguimientoRepository:
             return self._to_seguimiento(doc)
         return None
 
+    def get_by_actividad(self, actividad_id: str) -> List[Seguimiento]:
+        docs = (
+            self.db.collection("seguimientos")
+            .where("actividad_id", "==", actividad_id)
+            .stream()
+        )
+        return [self._to_seguimiento(doc) for doc in docs]
+
     def update(
         self, seguimiento_id: str, seguimiento_update: SeguimientoUpdate
     ) -> Optional[Seguimiento]:

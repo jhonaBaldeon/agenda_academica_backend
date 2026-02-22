@@ -125,10 +125,57 @@ def update_actividad(
     actividad_id: str,
     actividad_update: ActividadUpdate,
     repo: ActividadRepository = Depends(get_actividad_repository),
+    seguimiento_repo: SeguimientoRepository = Depends(get_seguimiento_repository),
 ):
     actividad = repo.update(actividad_id, actividad_update)
     if not actividad:
         raise HTTPException(status_code=404, detail="Actividad no encontrada")
+
+    # Actualizar seguimientos relacionados
+    try:
+        update_data = actividad_update.model_dump(exclude_unset=True)
+
+        # Actualizar titulo en seguimientos
+        if "titulo" in update_data:
+            seguimientos = seguimiento_repo.get_by_actividad(actividad_id)
+            for seg in seguimientos:
+                from ..schemas.seguimiento_schema import SeguimientoUpdate
+
+                seg_update = SeguimientoUpdate(
+                    actividad_titulo=update_data["titulo"],
+                )
+                seguimiento_repo.update(seg.id, seg_update)
+
+        # Actualizar descripcion en seguimientos
+        if "descripcion" in update_data:
+            seguimientos = seguimiento_repo.get_by_actividad(actividad_id)
+            for seg in seguimientos:
+                from ..schemas.seguimiento_schema import SeguimientoUpdate
+
+                seg_update = SeguimientoUpdate(
+                    actividad_descripcion=update_data["descripcion"],
+                )
+                seguimiento_repo.update(seg.id, seg_update)
+
+        # Actualizar fecha_entrega en seguimientos
+        if "fecha_entrega" in update_data:
+            fecha = update_data["fecha_entrega"]
+            if isinstance(fecha, str):
+                from datetime import datetime
+
+                fecha = datetime.fromisoformat(fecha.replace("Z", "+00:00"))
+            seguimientos = seguimiento_repo.get_by_actividad(actividad_id)
+            for seg in seguimientos:
+                from ..schemas.seguimiento_schema import SeguimientoUpdate
+
+                seg_update = SeguimientoUpdate(
+                    actividad_fecha_entrega=fecha,
+                )
+                seguimiento_repo.update(seg.id, seg_update)
+
+    except Exception as e:
+        print(f"Error updating seguimientos: {e}")
+
     return actividad
 
 
