@@ -20,6 +20,7 @@ class CursoUpdate(BaseModel):
     nombre_docente: Optional[str] = None
     horario: Optional[str] = None
     color: Optional[int] = None
+    docente_id: Optional[str] = None
 
 
 class Curso(CursoBase):
