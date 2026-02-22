@@ -2,9 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from ..schemas.curso_schema import Curso, CursoCreate, CursoUpdate
 from ..schemas.actividad_schema import Actividad, ActividadCreate, ActividadUpdate
-from ..repositories.dependencies import get_curso_repository, get_actividad_repository
+from ..repositories.dependencies import (
+    get_curso_repository,
+    get_actividad_repository,
+    get_seguimiento_repository,
+    get_alumno_repository,
+)
 from ..repositories.curso_repository import CursoRepository
 from ..repositories.actividad_repository import ActividadRepository
+from ..repositories.seguimiento_repository import SeguimientoRepository
+from ..repositories.alumno_repository import AlumnoRepository
 
 router = APIRouter(prefix="/cursos", tags=["cursos"])
 
@@ -60,10 +67,49 @@ def delete_curso(
 def create_actividad(
     curso_id: str,
     actividad: ActividadCreate,
-    repo: ActividadRepository = Depends(get_actividad_repository),
+    actividad_repo: ActividadRepository = Depends(get_actividad_repository),
+    seguimiento_repo: SeguimientoRepository = Depends(get_seguimiento_repository),
+    alumno_repo: AlumnoRepository = Depends(get_alumno_repository),
+    curso_repo: CursoRepository = Depends(get_curso_repository),
 ):
     actividad.curso_id = curso_id
-    return repo.create(actividad)
+    nueva_actividad = actividad_repo.create(actividad)
+
+    # Obtener el curso para obtener el nombre
+    curso = curso_repo.get_by_id(curso_id)
+    curso_nombre = curso.nombre_curso if curso else "Curso"
+
+    # Obtener todos los alumnos y crear seguimientos
+    try:
+        alumnos = alumno_repo.get_all()
+        for alumno in alumnos:
+            # Verificar si ya existe un seguimiento para esta actividad y alumno
+            existing = seguimiento_repo.get_by_alumno_and_actividad(
+                alumno.id, nueva_actividad.id
+            )
+            if not existing:
+                from ..schemas.seguimiento_schema import (
+                    SeguimientoCreate,
+                    EstadoSeguimiento,
+                )
+
+                seguimiento = SeguimientoCreate(
+                    alumno_id=alumno.id,
+                    alumno_nombre=alumno.nombres,
+                    actividad_id=nueva_actividad.id,
+                    actividad_titulo=nueva_actividad.titulo,
+                    actividad_descripcion=nueva_actividad.descripcion,
+                    actividad_fecha_entrega=nueva_actividad.fecha_entrega,
+                    curso_id=curso_id,
+                    curso_nombre=curso_nombre,
+                    estado=EstadoSeguimiento.incompleto,
+                    observaciones=None,
+                )
+                seguimiento_repo.create(seguimiento)
+    except Exception as e:
+        print(f"Error creating seguimientos: {e}")
+
+    return nueva_actividad
 
 
 @router.get("/{curso_id}/actividades", response_model=List[Actividad])
