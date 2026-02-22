@@ -91,11 +91,7 @@ class ActividadRepository:
         return nueva_actividad
 
     def get_all(self) -> List[Actividad]:
-        docs = (
-            self.db.collection("actividades")
-            .order_by("created_at", direction=firestore.Query.DESCENDING)
-            .stream()
-        )
+        docs = self.db.collection("actividades").stream()
         actividades = []
         for doc in docs:
             data = doc.to_dict()
@@ -133,10 +129,7 @@ class ActividadRepository:
 
     def get_by_curso(self, curso_id: str) -> List[Actividad]:
         docs = (
-            self.db.collection("actividades")
-            .where("curso_id", "==", curso_id)
-            .order_by("created_at", direction=firestore.Query.DESCENDING)
-            .stream()
+            self.db.collection("actividades").where("curso_id", "==", curso_id).stream()
         )
         actividades = []
         for doc in docs:
