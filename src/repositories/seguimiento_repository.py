@@ -210,3 +210,15 @@ class SeguimientoRepository:
             doc.reference.delete()
             count += 1
         return count
+
+    def delete_by_curso(self, curso_id: str) -> int:
+        docs = (
+            self.db.collection("seguimientos")
+            .where("curso_id", "==", curso_id)
+            .stream()
+        )
+        count = 0
+        for doc in docs:
+            doc.reference.delete()
+            count += 1
+        return count

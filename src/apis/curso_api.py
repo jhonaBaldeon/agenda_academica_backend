@@ -57,7 +57,11 @@ def delete_curso(
     curso_id: str,
     curso_repo: CursoRepository = Depends(get_curso_repository),
     actividad_repo: ActividadRepository = Depends(get_actividad_repository),
+    seguimiento_repo: SeguimientoRepository = Depends(get_seguimiento_repository),
 ):
+    # Primero eliminar todos los seguimientos del curso
+    seguimiento_repo.delete_by_curso(curso_id)
+    # Eliminar las actividades del curso
     actividad_repo.delete_by_curso(curso_id)
     if not curso_repo.delete(curso_id):
         raise HTTPException(status_code=404, detail="Curso no encontrado")
@@ -184,6 +188,9 @@ def delete_actividad(
     curso_id: str,
     actividad_id: str,
     repo: ActividadRepository = Depends(get_actividad_repository),
+    seguimiento_repo: SeguimientoRepository = Depends(get_seguimiento_repository),
 ):
+    # Primero eliminar todos los seguimientos de la actividad
+    seguimiento_repo.delete_by_actividad(actividad_id)
     if not repo.delete(actividad_id):
         raise HTTPException(status_code=404, detail="Actividad no encontrada")
