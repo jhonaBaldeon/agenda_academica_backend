@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Body
+from typing import List, Any
 from ..schemas.curso_schema import Curso, CursoCreate, CursoUpdate
 from ..schemas.actividad_schema import Actividad, ActividadCreate, ActividadUpdate
 from ..repositories.dependencies import (
@@ -43,9 +43,20 @@ def get_curso(curso_id: str, repo: CursoRepository = Depends(get_curso_repositor
 @router.put("/{curso_id}", response_model=Curso)
 def update_curso(
     curso_id: str,
-    curso_update: CursoUpdate,
+    body: dict = Body(...),
     repo: CursoRepository = Depends(get_curso_repository),
 ):
+    # Convertir camelCase a snake_case
+    data = {}
+    for key, value in body.items():
+        if key == "nombreCurso":
+            data["nombre_curso"] = value
+        elif key == "nombreDocente":
+            data["nombre_docente"] = value
+        else:
+            data[key] = value
+
+    curso_update = CursoUpdate(**data)
     curso = repo.update(curso_id, curso_update)
     if not curso:
         raise HTTPException(status_code=404, detail="Curso no encontrado")
